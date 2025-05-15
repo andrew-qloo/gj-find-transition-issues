@@ -1,4 +1,4 @@
-name: 'Jira find and transition issues'
+name: 'Jira find and transition issues (if found)'
 description: 'Find Jira issue keys from commit and transition them to status which you want'
 branding:
   icon: 'box'

@@ -47,24 +47,28 @@ class App {
     const transitionIds = [];
     const issueKeys = [];
     for (const issue of issues) {
-      const issueData = await this.jira.getIssue(issue)
-      const issuetypeName = issueData.fields.issuetype.name
-      const issueStatus = issueData.fields.status.name
-      const issuetypeIndex = this.issuetypes.indexOf(issuetypeName)
-      
-      if (this.transitions[issuetypeIndex] !== issueStatus) { // current status !== transition status
-        issueKeys.push(issue)
-        const { transitions: availableTransitions } = await this.jira.getIssueTransitions(issue)
-        const designedTransition = availableTransitions.find(eachTransition => eachTransition.name === this.transitions[issuetypeIndex])
-        if (!designedTransition) {
-          throw new Error(`Cannot find transition "${this.transitions[issuetypeIndex]}"`)
+      try {
+        const issueData = await this.jira.getIssue(issue)
+        const issuetypeName = issueData.fields.issuetype.name
+        const issueStatus = issueData.fields.status.name
+        const issuetypeIndex = this.issuetypes.indexOf(issuetypeName)
+
+        if (this.transitions[issuetypeIndex] !== issueStatus) { // current status !== transition status
+          issueKeys.push(issue)
+          const { transitions: availableTransitions } = await this.jira.getIssueTransitions(issue)
+          const designedTransition = availableTransitions.find(eachTransition => eachTransition.name === this.transitions[issuetypeIndex])
+          if (!designedTransition) {
+            throw new Error(`Cannot find transition "${this.transitions[issuetypeIndex]}"`)
+          }
+          transitionIds.push({
+            id: designedTransition.id,
+            name: designedTransition.name
+          })
+        } else { // current status === transition status
+          console.log(`Issue ${issue} is already in ${issueStatus} status`)
         }
-        transitionIds.push({
-          id: designedTransition.id,
-          name: designedTransition.name
-        })
-      } else { // current status === transition status
-        console.log(`Issue ${issue} is already in ${issueStatus} status`)
+      } catch (error) {
+        console.log(`Error processing issue ${issue}: ${error.message}`)
       }
     }
     return { issueKeys, transitionIds }
