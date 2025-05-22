@@ -51,15 +51,12 @@ class App {
         const issueData = await this.jira.getIssue(issue)
         const issuetypeName = issueData.fields.issuetype.name
         const issueStatus = issueData.fields.status.name
-        const issuetypeIndex = this.issuetypes.indexOf(issuetypeName)
+        const foundIssuetypeIndex = this.issuetypes.indexOf(issuetypeName)
+        const issuetypeIndex = foundIssuetypeIndex > -1 ? foundIssuetypeIndex : 0;
 
         if (this.transitions[issuetypeIndex] !== issueStatus) { // current status !== transition status
           const { transitions: availableTransitions } = await this.jira.getIssueTransitions(issue)
           const designedTransition = availableTransitions.find(eachTransition => eachTransition.name === this.transitions[issuetypeIndex])
-          console.log('designedTransition', designedTransition);
-          console.log('availableTransitions', availableTransitions);
-          console.log('this.transitions', this.transitions);
-          console.log('issuetypeIndex', issuetypeIndex);
           if (!designedTransition) {
             throw new Error(`Cannot find transition "${this.transitions[issuetypeIndex]}"`)
           }
