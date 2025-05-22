@@ -59,6 +59,7 @@ class App {
           console.log('designedTransition', designedTransition);
           console.log('availableTransitions', availableTransitions);
           console.log('this.transitions', this.transitions);
+          console.log('issuetypeIndex', issuetypeIndex);
           if (!designedTransition) {
             throw new Error(`Cannot find transition "${this.transitions[issuetypeIndex]}"`)
           }
